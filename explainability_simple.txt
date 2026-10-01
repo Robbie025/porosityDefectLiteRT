@@ -1,0 +1,20 @@
+Explainability for porosity defect inspection
+
+A classifier says whether a camera image looks defective or OK. Explainability
+helps an inspector see which image areas contributed to that decision. In this
+project, the model also produces a heatmap: brighter areas carry more evidence
+for a defect. The camera tool blurs small parts of the image one at a time and
+draws approximate rectangles where this changes the classifier's decision most.
+
+This matters because a high defect score alone does not reveal whether the
+model looked at a pore, a scratch, the casting edge, a shadow, or the background.
+Reviewing the heatmap can expose mistakes caused by lighting, camera position,
+or features that happened to correlate with the training labels. It also gives
+an inspector a place to check and helps explain disputed results.
+
+The supplied images are labeled only as defective or OK. Nobody marked the
+exact defect pixels or boxes. The heatmap is therefore learned indirectly from
+whole-image labels. Heatmaps and rectangles are clues about model evidence, not measured
+defect boundaries or proof that a pore exists there. Check important results
+against the image and a human inspection. To measure localization accuracy or
+train a precise detector, obtain human-reviewed defect boxes or masks.

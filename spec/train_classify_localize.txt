@@ -1,0 +1,20 @@
+Goal: Identify and Classify porosity defect with localization. 
+
+Task 1:
+1. The model should be based on model-explainability-in-industrial-image-detection.pynb
+2. train the model to identify and classify porosity defects.
+3. train the model to localize defects.
+4. Create new set of python files. dont change anything.
+5. Use the .venv 
+6. use the data in the datasets folder for training.
+
+Task 2: 
+1. tool to read the usb camera to run the tflite ml model.
+2. the scipt should let the user input 1 to start the inference.
+3. use 0 to stop the inference and end the script.
+4. the preview image should have a rectangule block which is the focus of the inference. once 1 is pressed, the bounding box should blink.
+
+
+
+Additional task:
+Wirte explainability_simple.txt. what is explainability in the context of defects. why is necessary.

@@ -1,0 +1,9 @@
+Goal: A webcam test for the tflite ml-model in artifact model.
+
+1. use the usb as input source. 
+2. live preview should print out if porosity defects are detected or not. 
+3. dont change any other file. 
+4. name the file camera_feed_test.py. use the .venv that already exist.
+5. live defbug output. update only 5 secongs in the termianl windows.
+4. Live preview should also highlight the the detected defect in dark red circles.
+

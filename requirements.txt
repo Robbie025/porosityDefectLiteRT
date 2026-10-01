@@ -1,0 +1,14 @@
+# Project dependencies for training and USB-camera inference.
+# TensorFlow installs compatible Keras and NumPy versions.
+tensorflow==2.20.0
+tensorflow-text==2.20.1
+keras-hub==0.32.0
+numpy==2.2.6
+Pillow>=11.3,<12
+opencv-python>=4.12,<6
+
+# Test suite.
+pytest>=8.4,<9
+
+# NVIDIA GPU experiment on Linux: install tensorflow[and-cuda]==2.20.0
+# in a separate virtual environment after checking GPU compatibility.

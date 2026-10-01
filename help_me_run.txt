@@ -1,0 +1,109 @@
+Porosity model: training and USB-camera inference
+=================================================
+
+Run these commands from the project directory:
+
+  cd /home/robxrobbie/androidstudio/QTbyVolvo/porosity_test_tf_3_novenv
+
+The virtual environment is ../venv. Install the project packages once:
+
+  ../venv/bin/python -m pip install -r requirements.txt
+
+You do not need to activate the environment when using ../venv/bin/python.
+
+1. Train and export the model
+-----------------------------
+
+  ../venv/bin/python train_classify_localize.py
+
+This trains on datasets/casting_data/casting_data and writes the new model and
+metrics to artifacts/classify_localize/. By default it initializes matching
+classification layers from artifacts/casting_defect_cnn.keras when that file
+exists, then trains with the dataset. It uses up to 20 epochs and may stop
+early. To use a smaller batch if memory is limited:
+
+  ../venv/bin/python train_classify_localize.py --batch-size 8
+
+To choose different input and output directories:
+
+  ../venv/bin/python train_classify_localize.py --data-dir datasets/casting_data/casting_data --output-dir artifacts/classify_localize
+
+The exported model is:
+
+  artifacts/classify_localize/casting_classify_localize_int8.tflite
+
+Review artifacts/classify_localize/metrics.json after training. If the
+accuracy gate fails, the command exits with an error; it still writes the
+artifacts and metrics for inspection. The existing exported model already
+achieved 99.58% accuracy on the held-out test images.
+
+2. Check inference without a camera
+-----------------------------------
+
+  ../venv/bin/python camera_classify_localize.py --self-test
+
+3. Run live USB-camera inference
+--------------------------------
+
+  ../venv/bin/python camera_classify_localize.py
+
+The preview opens with a centered square focus region. In the terminal, type
+1 and press Enter to start inference; the focus rectangle then blinks. Type
+0 and press Enter to stop and close the program. Pressing Q or Esc in the
+preview also exits.
+
+To select a specific camera (for example /dev/video0):
+
+  ../venv/bin/python camera_classify_localize.py --camera-index 0
+
+Defect rectangles are approximate explanations of the classifier's response.
+The dataset has no annotated defect boxes or masks, so rectangle accuracy
+cannot be measured from these images.
+
+4. NVIDIA GPU suggestions for TensorFlow on this Linux machine
+---------------------------------------------------------------
+
+Check the driver and TensorFlow visibility:
+
+  nvidia-smi
+  ../venv/bin/python -c "import tensorflow as tf; print(tf.__version__); print(tf.config.list_physical_devices('GPU'))"
+
+On this machine, nvidia-smi sees a Quadro M2000 (4 GB). If TensorFlow prints
+[] for GPU devices, it will train on the CPU. The "CUDA
+Version 13.0" shown by nvidia-smi is the maximum CUDA version supported by the
+driver, not proof that a CUDA 13 toolkit is installed. The M2000 is a Maxwell
+GPU with compute capability 5.2. CUDA 13 removed Maxwell support; use a CUDA
+12.x-compatible stack for this card.
+
+For an isolated experiment, leave ../venv as the normal project setup and
+try TensorFlow's official pip GPU package in a separate environment:
+
+  python3 -m venv .venv_gpu
+  .venv_gpu/bin/python -m pip install --upgrade pip
+  .venv_gpu/bin/python -m pip install 'tensorflow[and-cuda]==2.20.0' pillow opencv-python
+  .venv_gpu/bin/python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+
+Only train with that environment if the last command lists a GPU:
+
+  .venv_gpu/bin/python train_classify_localize.py --batch-size 8 --output-dir artifacts/classify_localize_gpu
+
+TensorFlow 2.20 was tested with CUDA 12.5 and cuDNN 9.3. Its prebuilt wheel
+may still lack kernels for this older compute capability. If the GPU list is
+empty or training reports an invalid kernel image, follow TensorFlow's Linux
+build-from-source guide and target compute capability 5.2 with a CUDA 12.x
+toolchain, or use a newer supported GPU. Do not install CUDA 13 to target the
+M2000. With only 4 GB VRAM, start with --batch-size 8 (or smaller). If the
+GPU becomes visible, enable TensorFlow memory growth before model creation
+if it otherwise reserves too much VRAM:
+
+  import tensorflow as tf
+  gpus = tf.config.list_physical_devices('GPU')
+  for gpu in gpus:
+      tf.config.experimental.set_memory_growth(gpu, True)
+
+Documentation:
+  https://www.tensorflow.org/install/pip
+  https://www.tensorflow.org/install/source
+  https://www.tensorflow.org/guide/gpu
+  https://developer.nvidia.com/cuda/gpus/legacy
+  https://docs.nvidia.com/cuda/archive/13.0.0/cuda-toolkit-release-notes/index.html

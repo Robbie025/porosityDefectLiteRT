@@ -1,0 +1,8 @@
+Goal: Make a tensorflow lite model so that it can be used in an android app. 
+
+The training model should mirror the one in the pythonmode in the folder.
+Create a separete python file. do not change the python notenook.
+create a venv and update the requirements.txt file.
+use the data in the datasets folder. 
+Check the feasibility of creating the model using transfer learning form MobileNetV5 released by google. 
+if feasible the final model should be based on transfer learned model.
